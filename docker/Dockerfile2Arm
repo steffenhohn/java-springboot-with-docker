@@ -8,8 +8,9 @@
 # Then run the container using:
 #
 # docker run -i --rm -p 8081:8081 springboot/sample-demo
+# bellsoft/liberica-openjdk-alpine-musl:17
 ####
-FROM bellsoft/liberica-openjdk-alpine-musl:17
+FROM arm64v8/maven
 
 WORKDIR /build
 
