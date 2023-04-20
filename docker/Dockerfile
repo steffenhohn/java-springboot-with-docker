@@ -24,9 +24,13 @@ RUN mvn package -Dmaven.test.skip=true
 RUN grep version /build/target/maven-archiver/pom.properties | cut -d '=' -f2 >.env-version 
 RUN grep artifactId /build/target/maven-archiver/pom.properties | cut -d '=' -f2 >.env-id
 RUN mv /build/target/$(cat .env-id)-$(cat .env-version).jar /build/target/export-run-artifact.jar
+RUN java -Djarmode=layertools -jar /build/target/export-run-artifact.jar extract
 
 FROM openjdk:11-jdk
-COPY --from=0 /build/target/export-run-artifact.jar  /app/target/export-run-artifact.jar
+COPY --from=0 build/dependencies/ ./
+COPY --from=0 build/snapshot-dependencies/ ./
+COPY --from=0 build/spring-boot-loader/ ./
+COPY --from=0 build/application/ ./
 
 EXPOSE 8081
-ENTRYPOINT [ "java", "-jar", "/app/target/export-run-artifact.jar", "--server.port=8081" ]
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher", "--server.port=8081"]
